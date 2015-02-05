@@ -1,4 +1,5 @@
 *.class
+*.jar
 
 # ant build output
 classes/
@@ -6,3 +7,7 @@ classes/
 # IntelliJ files
 *.iml
 .idea/
+
+# Jade generated files
+APDescription.txt
+MTPs-Main-Container.txt

@@ -206,6 +206,16 @@ ant dist - to create the distribution files
 		<!-- Compile the java code from ${src} into ${build} -->
 		<javac srcdir="${src}" destdir="${build}" nowarn="off" optimize="${javac.optimize}" debug="${javac.debug}" deprecation="off" includes="examples/**" excludes="examples/jess/**,examples/JadeJessProtege/**" classpath="${lib}/jade.jar"/>
 	</target>
+  
+  <!--  _______________________________________________
+	                           assignment
+	      _______________________________________________ -->
+  
+  <target name="assignment" depends="lib" description="compile all assignment code">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" nowarn="off" optimize="${javac.optimize}" debug="${javac.debug}" deprecation="off" includes="assignment/**" 
+    classpath="${lib}/jade.jar"/>
+	</target>
 	
 	<!--  _______________________________________________
 	                           JESS-based examples
