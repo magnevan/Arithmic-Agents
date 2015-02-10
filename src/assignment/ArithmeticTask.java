@@ -1,10 +1,6 @@
 package assignment;
 
-import java.text.ParseException;
-
 public class ArithmeticTask {
-  public enum Operator {ADD, SUBTRACT, MULTIPLY, DIVIDE};
-
   final int a, b;
   final Operator op;
 
