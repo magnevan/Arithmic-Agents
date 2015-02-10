@@ -1,5 +1,8 @@
 package assignment;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 public class ArithmeticTask {
   private static int nextID = 0;
 
@@ -23,26 +26,22 @@ public class ArithmeticTask {
     this.uniqueId = id;
   }
 
-  public static ArithmeticTask fromString(String content) {
-    String[] parts = content.split(",");
-    double a, b;
-    Operator op;
-    try {
-      a = Double.parseDouble(parts[0]);
-      b = Double.parseDouble(parts[1]);
-      op = stringToOperator(parts[2]);
-    } catch (Exception e) {
-      return null;
-    }
-
-    return new ArithmeticTask(a, b, op, 0); // TODO fix parsing
+  public String toJson() {
+    JSONObject obj = new JSONObject();
+    obj.put("a", a);
+    obj.put("b", b);
+    obj.put("op", op.getText());
+    obj.put("id", uniqueId);
+    return obj.toJSONString();
   }
 
-  private static Operator stringToOperator(String op) throws Exception {
-    if      (op == "+") return Operator.ADD;
-    else if (op == "-") return Operator.SUBTRACT;
-    else if (op == "*") return Operator.MULTIPLY;
-    else if (op == "/") return Operator.DIVIDE;
-    else throw new Exception();
+  public static ArithmeticTask fromJson(String json) {
+    JSONObject obj = (JSONObject) JSONValue.parse(json);
+    return new ArithmeticTask(
+      Double.parseDouble((String) obj.get("a")),
+      Double.parseDouble((String) obj.get("b")),
+      Operator.fromString((String) obj.get("op")),
+      Integer.parseInt((String) obj.get("id"))
+    );
   }
 }

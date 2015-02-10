@@ -53,7 +53,7 @@ public abstract class ArithmeticSolver extends Agent {
       ACLMessage reply = msg.createReply();
       if (msg != null) {
         ArithmeticTask task;
-        task = ArithmeticTask.fromString(msg.getContent());
+        task = ArithmeticTask.fromJson(msg.getContent());
 
         if (task == null) {
           reply.setPerformative(ACLMessage.FAILURE);
@@ -82,7 +82,7 @@ public abstract class ArithmeticSolver extends Agent {
       ACLMessage reply = msg.createReply();
       if (msg != null) {
         ArithmeticTask task;
-        task = ArithmeticTask.fromString(msg.getContent());
+        task = ArithmeticTask.fromJson(msg.getContent());
 
         if (task == null) {
           reply.setPerformative(ACLMessage.REFUSE);
