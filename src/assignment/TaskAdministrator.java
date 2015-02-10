@@ -44,16 +44,18 @@ public class TaskAdministrator extends Agent {
         doDelete();
       }
     }
+
+    addBehaviour(new FindSubtasksBehavior());
   }
 
   /**
-   * Strategy for assigning problems is to look through the job linked list
+   * Strategy for finding subtasks is to look through the job list
    * until you find an operator (where started = false). Then checking
    * if the previous two elements in the list is numbers. If so, set these
-   * as started, hand out the problem and continue looking through the list.
+   * as started, package up the problem and continue looking through the list.
    * This way we get the maximum parallelization possible (I think).
    */
-  private class AssignProblemsBehavior extends OneShotBehaviour {
+  private class FindSubtasksBehavior extends OneShotBehaviour {
 
     @Override
     public void action() {
