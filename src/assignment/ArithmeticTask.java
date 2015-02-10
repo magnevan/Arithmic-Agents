@@ -1,29 +1,41 @@
 package assignment;
 
 public class ArithmeticTask {
-  final int a, b;
+  private static int nextID = 0;
+
+  final double a, b;
   final Operator op;
 
-  public ArithmeticTask(int a, int b, Operator op) {
+  public final int uniqueId;
+
+  public ArithmeticTask(double a, double b, Operator op) {
     this.a = a;
     this.b = b;
     this.op = op;
+    this.uniqueId = nextID;
+    nextID++;
   }
 
+  private ArithmeticTask(double a, double b, Operator op, int id) {
+    this.a = a;
+    this.b = b;
+    this.op = op;
+    this.uniqueId = id;
+  }
 
   public static ArithmeticTask fromString(String content) {
     String[] parts = content.split(",");
-    int a, b;
+    double a, b;
     Operator op;
     try {
-      a = Integer.parseInt(parts[0]);
-      b = Integer.parseInt(parts[1]);
+      a = Double.parseDouble(parts[0]);
+      b = Double.parseDouble(parts[1]);
       op = stringToOperator(parts[2]);
     } catch (Exception e) {
       return null;
     }
 
-    return new ArithmeticTask(a, b, op);
+    return new ArithmeticTask(a, b, op, 0); // TODO fix parsing
   }
 
   private static Operator stringToOperator(String op) throws Exception {

@@ -2,6 +2,10 @@ package assignment;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jdk.nashorn.internal.runtime.JSONFunctions;
@@ -19,6 +23,7 @@ public abstract class ArithmeticSolver extends Agent {
 
   protected abstract double doOperation(Operator op, double a, double b);
   protected abstract boolean canHandleOperator(Operator op);
+  protected abstract DFAgentDescription getAgentDescription();
 
   @Override
   protected void setup() {
@@ -26,6 +31,17 @@ public abstract class ArithmeticSolver extends Agent {
       "Hello! Addition-agent %s is ready.",
       getAID().getName()
     );
+    registerWithYellowpages();
+  }
+
+  private void registerWithYellowpages() {
+    DFAgentDescription dfd = getAgentDescription();
+    try {
+      DFService.register(this, dfd);
+    }
+    catch (FIPAException fe) {
+      fe.printStackTrace();
+    }
   }
 
   private class AcceptProblemsBehavior extends CyclicBehaviour {
