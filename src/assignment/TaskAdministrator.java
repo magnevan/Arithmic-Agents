@@ -133,6 +133,10 @@ public class TaskAdministrator extends Agent {
           if (proposal == null) continue;
           proposalsRemaining--;
           int offer = Integer.parseInt(proposal.getContent());
+          System.out.printf(
+            "Received new proposal %d ms from %s\n",
+            offer, proposal.getSender().getName()
+          );
           if (offer < bestTime) {
             bestTime = offer;
             bestAgent = proposal.getSender();
@@ -212,7 +216,7 @@ public class TaskAdministrator extends Agent {
         myAgent.addBehaviour(new FindSubtasksAndAuctionBehavior());
       }
 
-      block();
+      if (myAgent.getCurQueueSize() == 0) block();
     }
   }
 

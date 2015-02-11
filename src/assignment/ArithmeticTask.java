@@ -46,12 +46,14 @@ public class ArithmeticTask {
 
   public static ArithmeticTask fromJson(String json) {
     JSONObject obj = (JSONObject) JSONValue.parse(json);
+    Object answer = obj.get("answer");
+
     return new ArithmeticTask(
-      Double.parseDouble((String) obj.get("a")),
-      Double.parseDouble((String) obj.get("b")),
+      (Double) obj.get("a"),
+      (Double) obj.get("b"),
       Operator.fromString((String) obj.get("op")),
-      Double.parseDouble((String) obj.get("answer")),
-      Integer.parseInt((String) obj.get("id"))
+      (answer != null ? (double) answer : Double.NaN),
+      ((Long) obj.get("id")).intValue()
     );
   }
 }

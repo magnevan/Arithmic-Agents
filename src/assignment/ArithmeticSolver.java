@@ -1,25 +1,28 @@
 package assignment;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jdk.nashorn.internal.runtime.JSONFunctions;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 /**
  * Created by Magne on 05-Feb-15.
  */
 public abstract class ArithmeticSolver extends Agent {
-  private static final int delayPerProblemMs = 1000;
+  public static final int delayPerProblemMs = 1000;
 
   private Queue<ArithmeticTask> problemQueue = new LinkedList<>();
+  private Map<Integer, AID> taskToSender = new HashMap<>();
 
   protected abstract double doOperation(Operator op, double a, double b);
   protected abstract boolean canHandleOperator(Operator op);
@@ -32,6 +35,8 @@ public abstract class ArithmeticSolver extends Agent {
       getAID().getName()
     );
     registerWithYellowpages();
+    addBehaviour(new BidOnProblemsBehavior());
+    addBehaviour(new AcceptProblemsBehavior());
   }
 
   private void registerWithYellowpages() {
@@ -44,14 +49,42 @@ public abstract class ArithmeticSolver extends Agent {
     }
   }
 
+  private class SolveAndAnswerProblemsBehavior extends WakerBehaviour {
+    public SolveAndAnswerProblemsBehavior(Agent a, long timeout) {
+      super(a, timeout);
+    }
+
+    @Override
+    public void onWake() {
+      if (!problemQueue.isEmpty()) {
+        ArithmeticTask task = problemQueue.poll();
+        System.out.printf("Solving problem %s\n", task.readableDescription());
+
+        task.answer = doOperation(task.op, task.a, task.b);
+
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(taskToSender.remove(task.uniqueId));
+        msg.setContent(task.toJson());
+        myAgent.send(msg);
+
+        if (!problemQueue.isEmpty()) {
+          myAgent.addBehaviour(
+            new SolveAndAnswerProblemsBehavior(myAgent, delayPerProblemMs)
+          );
+        }
+      }
+    }
+
+  }
+
   private class AcceptProblemsBehavior extends CyclicBehaviour {
     @Override
     public void action() {
       ACLMessage msg = myAgent.receive(
         MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL)
       );
-      ACLMessage reply = msg.createReply();
       if (msg != null) {
+        ACLMessage reply = msg.createReply();
         ArithmeticTask task;
         task = ArithmeticTask.fromJson(msg.getContent());
 
@@ -64,11 +97,17 @@ public abstract class ArithmeticSolver extends Agent {
           reply.setContent("no-capability");
           myAgent.send(reply);
         } else {
-          problemQueue.add(task); // TODO need to add the asker
+          if (problemQueue.isEmpty()) {
+            addBehaviour(new SolveAndAnswerProblemsBehavior(
+              myAgent, delayPerProblemMs
+            ));
+          }
+          problemQueue.add(task);
+          taskToSender.put(task.uniqueId, msg.getSender());
         }
       } else {
         // Stop execution of this behavior until a new message is received
-        block();
+        if (myAgent.getCurQueueSize() == 0) block();
       }
     }
   }
@@ -101,7 +140,7 @@ public abstract class ArithmeticSolver extends Agent {
         myAgent.send(reply);
       } else {
         // Stop execution of this behavior until a new message is received
-        block();
+        if (myAgent.getCurQueueSize() == 0) block();
       }
     }
   }
