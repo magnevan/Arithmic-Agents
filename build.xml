@@ -133,15 +133,20 @@ ant dist - to create the distribution files
 	    <delete dir="${build}/demo"/> -->
 		<javac srcdir="${src}" 
 		       destdir="${build}" 
-		       classpath="lib/commons-codec/commons-codec-1.3.jar" 
 		       nowarn="on" 
 		       optimize="${javac.optimize}" 
 		       debug="${javac.debug}" 
 		       debuglevel="lines,vars,source" 
 		       deprecation="on" 
-			   target="1.5"
-			   source="1.5"
+			   target="8"
+			   source="8"
 		       excludes="demo/**,examples/**,test/**" >
+      <classpath>
+        <fileset dir="${lib}">
+          <include name="commons-codec/commons-codec-1.3.jar" />
+          <include name="json-simple-1.1.1.jar" />
+        </fileset>
+      </classpath>
 		</javac>
 		
 		<copy todir="${build}">
@@ -213,8 +218,14 @@ ant dist - to create the distribution files
   
   <target name="assignment" depends="lib" description="compile all assignment code">
 		<!-- Compile the java code from ${src} into ${build} -->
-		<javac srcdir="${src}" destdir="${build}" nowarn="off" optimize="${javac.optimize}" debug="${javac.debug}" deprecation="off" includes="assignment/**" 
-    classpath="${lib}/jade.jar"/>
+		<javac srcdir="${src}" destdir="${build}" nowarn="off" optimize="${javac.optimize}" debug="${javac.debug}" deprecation="off" includes="assignment/**">
+      <classpath>
+        <fileset dir="${lib}">
+          <include name="jade.jar" />
+          <include name="json-simple-1.1.1.jar" />
+        </fileset>
+      </classpath>
+    </javac>
 	</target>
 	
 	<!--  _______________________________________________

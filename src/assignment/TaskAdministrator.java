@@ -31,8 +31,14 @@ public class TaskAdministrator extends Agent {
     taskToJobElement = new HashMap<>();
 
     // The input is a space separated list of numbers and operators
-    String[] args = (String[])getArguments();
-    for (String part : args) {
+    Object[] args = getArguments();
+    if (args == null || args.length < 1) {
+      doDelete();
+      System.out.println("You have to pass in some problem to be parsed");
+      return;
+    }
+    String jobString = (String) args[0];
+    for (String part : jobString.split(" ")) {
       // Control flow is a little strange here because default java doesn't
       // let you check if a string is a valid double without trying to parse
       // and catching the error.
@@ -189,12 +195,20 @@ public class TaskAdministrator extends Agent {
         job.remove(index-1);
         job.remove(index-2);
 
+        System.out.printf(
+          "Received answer to %s = %.2f from %s\n",
+          task.readableDescription(),
+          task.answer,
+          msg.getSender().getName()
+        );
+
         JobElement answer = new JobElement(task.answer);
         job.add(index-2, answer);
         receivedAnswers = true;
       }
 
       if (receivedAnswers) {
+        System.out.printf("New problem is: %s\n", job.toString());
         myAgent.addBehaviour(new FindSubtasksAndAuctionBehavior());
       }
 
@@ -227,5 +241,14 @@ public class TaskAdministrator extends Agent {
 
     public void start() { started = true; }
     public boolean isStarted() { return started; }
+
+    @Override
+    public String toString() {
+      if (op != null) {
+        return op.getSymbol();
+      } else {
+        return number.toString();
+      }
+    }
   }
 }

@@ -30,6 +30,10 @@ public class ArithmeticTask {
     this.uniqueId = id;
   }
 
+  public String readableDescription() {
+    return String.format("%.2f%s%.2f", a, op.getSymbol(), b);
+  }
+
   public String toJson() {
     JSONObject obj = new JSONObject();
     obj.put("a", a);

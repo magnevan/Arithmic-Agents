@@ -29,5 +29,4 @@ public class SubtractionSolver extends ArithmeticSolver {
     dfd.addServices(sd);
     return dfd;
   }
-  }
 }

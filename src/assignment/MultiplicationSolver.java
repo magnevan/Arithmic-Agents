@@ -29,5 +29,4 @@ public class MultiplicationSolver extends ArithmeticSolver {
     dfd.addServices(sd);
     return dfd;
   }
-  }
 }

@@ -28,7 +28,7 @@ public abstract class ArithmeticSolver extends Agent {
   @Override
   protected void setup() {
     System.out.printf(
-      "Hello! Addition-agent %s is ready.",
+      "Hello! Agent %s is ready\n",
       getAID().getName()
     );
     registerWithYellowpages();
