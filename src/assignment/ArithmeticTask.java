@@ -6,8 +6,9 @@ import org.json.simple.JSONValue;
 public class ArithmeticTask {
   private static int nextID = 0;
 
-  final double a, b;
-  final Operator op;
+  public final double a, b;
+  public final Operator op;
+  public double answer = Double.NaN;
 
   public final int uniqueId;
 
@@ -19,10 +20,13 @@ public class ArithmeticTask {
     nextID++;
   }
 
-  private ArithmeticTask(double a, double b, Operator op, int id) {
+  private ArithmeticTask(
+    double a, double b, Operator op, double answer, int id
+  ) {
     this.a = a;
     this.b = b;
     this.op = op;
+    this.answer = answer;
     this.uniqueId = id;
   }
 
@@ -30,8 +34,9 @@ public class ArithmeticTask {
     JSONObject obj = new JSONObject();
     obj.put("a", a);
     obj.put("b", b);
-    obj.put("op", op.getText());
+    obj.put("op", op.getSymbol());
     obj.put("id", uniqueId);
+    obj.put("answer", answer);
     return obj.toJSONString();
   }
 
@@ -41,6 +46,7 @@ public class ArithmeticTask {
       Double.parseDouble((String) obj.get("a")),
       Double.parseDouble((String) obj.get("b")),
       Operator.fromString((String) obj.get("op")),
+      Double.parseDouble((String) obj.get("answer")),
       Integer.parseInt((String) obj.get("id"))
     );
   }

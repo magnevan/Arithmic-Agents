@@ -24,7 +24,7 @@ public class AdditionSolver extends ArithmeticSolver {
 
     ServiceDescription sd = new ServiceDescription();
     sd.setName("JADE-addition-service");
-    sd.setType("addition");
+    sd.setType(Operator.ADD.getText());
 
     dfd.addServices(sd);
     return dfd;

@@ -79,8 +79,9 @@ public abstract class ArithmeticSolver extends Agent {
       ACLMessage msg = myAgent.receive(
         MessageTemplate.MatchPerformative(ACLMessage.CFP) // call for proposal
       );
-      ACLMessage reply = msg.createReply();
       if (msg != null) {
+        ACLMessage reply = msg.createReply();
+
         ArithmeticTask task;
         task = ArithmeticTask.fromJson(msg.getContent());
 
