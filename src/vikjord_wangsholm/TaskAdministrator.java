@@ -121,8 +121,9 @@ public class TaskAdministrator extends Agent {
         // only wait 1 second for all proposals to come in
         long endTimeMs = System.currentTimeMillis() + 5000;
         int proposalsRemaining = agents.length;
-        AID bestAgent = null;
+        ACLMessage bestProposal = null;
         int bestTime = Integer.MAX_VALUE;
+        List<ACLMessage> allProposals = new ArrayList<>();
 
         while (
             proposalsRemaining > 0 &&
@@ -132,6 +133,7 @@ public class TaskAdministrator extends Agent {
               myAgent.blockingReceive(mt, endTimeMs - System.currentTimeMillis());
 
           if (proposal == null) continue;
+          allProposals.add(proposal);
           proposalsRemaining--;
           int offer = Integer.parseInt(proposal.getContent());
           System.out.printf(
@@ -140,20 +142,31 @@ public class TaskAdministrator extends Agent {
           );
           if (offer < bestTime) {
             bestTime = offer;
-            bestAgent = proposal.getSender();
+            bestProposal = proposal;
           }
         }
 
-        if (bestAgent != null) {
+        if (bestProposal != null) {
           // Send acceptance
           System.out.printf("Accepting proposal from %s for task %s\n",
-              bestAgent.getName(),
+              bestProposal.getSender().getLocalName(),
               task.readableDescription()
           );
-          ACLMessage acceptance = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-          acceptance.addReceiver(bestAgent);
+          ACLMessage acceptance = bestProposal.createReply();
+          acceptance.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
           acceptance.setContent(task.toJson());
           myAgent.send(acceptance);
+
+          // Send rejections to the rest of the proposals
+          for (ACLMessage proposal : allProposals) {
+            if (proposal == bestProposal) continue;
+
+            ACLMessage rejection = proposal.createReply();
+            rejection.setPerformative(ACLMessage.REJECT_PROPOSAL);
+            myAgent.send(rejection);
+          }
+
+
         } else {
           System.out.printf("Did not find an agent to solve %s within the time limit!\n",
               task.readableDescription());
