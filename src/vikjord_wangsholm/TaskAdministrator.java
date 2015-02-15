@@ -19,8 +19,8 @@ import java.util.*;
 public class TaskAdministrator extends Agent {
 
   protected List<JobElement> job;
-
   protected Map<Integer, JobElement> taskToJobElement;
+  protected ACLMessage queryRef;
 
   @Override
   protected void setup() {
@@ -29,34 +29,41 @@ public class TaskAdministrator extends Agent {
     job = new ArrayList<>();
     taskToJobElement = new HashMap<>();
 
-    // The input is a space separated list of numbers and operators
-    Object[] args = getArguments();
-    if (args == null || args.length < 1) {
-      doDelete();
-      System.out.println("You have to pass in some problem to be parsed");
-      return;
-    }
-    String jobString = (String) args[0];
-    for (String part : jobString.split(" ")) {
-      // Control flow is a little strange here because default java doesn't
-      // let you check if a string is a valid double without trying to parse
-      // and catching the error.
-      try {
-        job.add(new JobElement(Double.parseDouble(part)));
-        continue;
-      } catch (NumberFormatException e) {}
-
-      Operator op = Operator.fromString(part);
-      if (op != null) {
-        job.add(new JobElement(op));
-      } else {
-        System.err.printf("Failed to parse argument %s\n", part);
-        doDelete();
-      }
-    }
-
-    addBehaviour(new FindSubtasksAndAuctionBehavior());
     addBehaviour(new ReceiveSolutionsBehavior());
+    addBehaviour(new AcceptTask());
+  }
+
+  private class AcceptTask extends OneShotBehaviour {
+
+    @Override
+    public void action() {
+      job.clear();
+      taskToJobElement.clear();
+
+      queryRef = myAgent.blockingReceive(
+        MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF)
+      );
+
+      String jobString = queryRef.getContent();
+      for (String part : jobString.split(" ")) {
+        // Control flow is a little strange here because default java doesn't
+        // let you check if a string is a valid double without trying to parse
+        // and catching the error.
+        try {
+          job.add(new JobElement(Double.parseDouble(part)));
+          continue;
+        } catch (NumberFormatException e) {}
+
+        Operator op = Operator.fromString(part);
+        if (op != null) {
+          job.add(new JobElement(op));
+        } else {
+          System.err.printf("Failed to parse job %s\n", part);
+        }
+      }
+
+      addBehaviour(new FindSubtasksAndAuctionBehavior());
+    }
   }
 
   /**
@@ -236,10 +243,17 @@ public class TaskAdministrator extends Agent {
 
       if (receivedAnswers) {
         System.out.printf("New problem is: %s\n", job.toString());
-        myAgent.addBehaviour(new FindSubtasksAndAuctionBehavior());
+        if (job.size() != 1) {
+          myAgent.addBehaviour(new FindSubtasksAndAuctionBehavior());
+        } else {
+          ACLMessage reply = queryRef.createReply();
+          reply.setContent(job.get(0).toString());
+          myAgent.send(reply);
+          addBehaviour(new AcceptTask());
+        }
       }
 
-      //if (myAgent.getCurQueueSize() == 0) block();
+      if (myAgent.getCurQueueSize() == 0) block();
     }
   }
 
