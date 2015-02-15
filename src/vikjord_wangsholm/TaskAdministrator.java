@@ -247,6 +247,7 @@ public class TaskAdministrator extends Agent {
           myAgent.addBehaviour(new FindSubtasksAndAuctionBehavior());
         } else {
           ACLMessage reply = queryRef.createReply();
+          reply.setPerformative(ACLMessage.INFORM);
           reply.setContent(job.get(0).toString());
           myAgent.send(reply);
           addBehaviour(new AcceptTask());
