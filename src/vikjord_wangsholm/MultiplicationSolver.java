@@ -1,4 +1,4 @@
-package assignment;
+package vikjord_wangsholm;
 
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;

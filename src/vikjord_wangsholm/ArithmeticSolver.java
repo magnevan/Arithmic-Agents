@@ -1,4 +1,4 @@
-package assignment;
+package vikjord_wangsholm;
 
 import jade.core.AID;
 import jade.core.Agent;

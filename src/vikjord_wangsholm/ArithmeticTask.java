@@ -1,4 +1,4 @@
-package assignment;
+package vikjord_wangsholm;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;

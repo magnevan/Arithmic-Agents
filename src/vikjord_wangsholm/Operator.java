@@ -1,4 +1,4 @@
-package assignment;
+package vikjord_wangsholm;
 
 public enum Operator {
   ADD("+", "addition"),

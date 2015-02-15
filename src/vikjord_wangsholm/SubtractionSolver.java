@@ -1,4 +1,4 @@
-package assignment;
+package vikjord_wangsholm;
 
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -6,15 +6,15 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 /**
  * Created by Magne on 11-Feb-15.
  */
-public class DivisionSolver extends ArithmeticSolver {
+public class SubtractionSolver extends ArithmeticSolver {
   @Override
-  protected double doOperation(Operator op, double a, double b) {
-    return a/b;
+  protected double doOperation(vikjord_wangsholm.Operator op, double a, double b) {
+    return a-b;
   }
 
   @Override
-  protected boolean canHandleOperator(Operator op) {
-    return op == Operator.DIVIDE;
+  protected boolean canHandleOperator(vikjord_wangsholm.Operator op) {
+    return op == vikjord_wangsholm.Operator.SUBTRACT;
   }
 
   @Override
@@ -23,8 +23,8 @@ public class DivisionSolver extends ArithmeticSolver {
     dfd.setName(getAID());
 
     ServiceDescription sd = new ServiceDescription();
-    sd.setName("JADE-division-service");
-    sd.setType(Operator.DIVIDE.getText());
+    sd.setName("JADE-subtraction-service");
+    sd.setType(vikjord_wangsholm.Operator.SUBTRACT.getText());
 
     dfd.addServices(sd);
     return dfd;

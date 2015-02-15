@@ -1,4 +1,4 @@
-package assignment;
+package vikjord_wangsholm;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -10,7 +10,6 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.tools.sniffer.Message;
 
 import java.util.*;
 
@@ -65,7 +64,9 @@ public class TaskAdministrator extends Agent {
    * until you find an operator (where started = false). Then checking
    * if the previous two elements in the list is numbers. If so, set these
    * as started, package up the problem and continue looking through the list.
-   * This way we get the maximum parallelization possible (I think).
+   * This gives you a good amount of parallelization if the problem is formed
+   * properly: 5 2 + 1 7 + + is good 5 2 1 7 + + + is bad, even though
+   * the problems are identical.
    */
   private class FindSubtasksAndAuctionBehavior extends OneShotBehaviour {
 
@@ -81,7 +82,6 @@ public class TaskAdministrator extends Agent {
           if (i >= 2) {
             JobElement prev1 = job.get(i-1);
             JobElement prev2 = job.get(i-2);
-
             if (prev1.isNumber() && prev2.isNumber()) {
               prev1.start();
               prev2.start();
