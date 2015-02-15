@@ -100,6 +100,7 @@ public class TaskAdministrator extends Agent {
 
       while (!tasksAwaitingHandout.isEmpty()) {
         ArithmeticTask task = tasksAwaitingHandout.poll();
+        System.out.printf("Handing out task '%s'\n", task.readableDescription());
 
         // Sending CFP
         String biddingRoundIdentifier = "CFP-task-" + task.uniqueId;
@@ -118,24 +119,24 @@ public class TaskAdministrator extends Agent {
         );
 
         // only wait 1 second for all proposals to come in
-        long endTimeMs = System.currentTimeMillis() + 1000;
+        long endTimeMs = System.currentTimeMillis() + 5000;
         int proposalsRemaining = agents.length;
         AID bestAgent = null;
         int bestTime = Integer.MAX_VALUE;
 
         while (
-          proposalsRemaining > 0 &&
-          endTimeMs > System.currentTimeMillis()
-        ) {
+            proposalsRemaining > 0 &&
+                endTimeMs > System.currentTimeMillis()
+            ) {
           ACLMessage proposal =
-            myAgent.blockingReceive(mt, endTimeMs - System.currentTimeMillis());
+              myAgent.blockingReceive(mt, endTimeMs - System.currentTimeMillis());
 
           if (proposal == null) continue;
           proposalsRemaining--;
           int offer = Integer.parseInt(proposal.getContent());
           System.out.printf(
-            "Received new proposal %d ms from %s\n",
-            offer, proposal.getSender().getName()
+              "Received new proposal %d ms from %s\n",
+              offer, proposal.getSender().getName()
           );
           if (offer < bestTime) {
             bestTime = offer;
@@ -143,11 +144,20 @@ public class TaskAdministrator extends Agent {
           }
         }
 
-        // Send acceptance
-        ACLMessage acceptance = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-        acceptance.addReceiver(bestAgent);
-        acceptance.setContent(task.toJson());
-        myAgent.send(acceptance);
+        if (bestAgent != null) {
+          // Send acceptance
+          System.out.printf("Accepting proposal from %s for task %s\n",
+              bestAgent.getName(),
+              task.readableDescription()
+          );
+          ACLMessage acceptance = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+          acceptance.addReceiver(bestAgent);
+          acceptance.setContent(task.toJson());
+          myAgent.send(acceptance);
+        } else {
+          System.out.printf("Did not find an agent to solve %s within the time limit!\n",
+              task.readableDescription());
+        }
       }
     }
 
@@ -166,7 +176,7 @@ public class TaskAdministrator extends Agent {
         sellerAgents = new AID[result.length];
         for (int i = 0; i < result.length; ++i) {
           sellerAgents[i] = result[i].getName();
-          System.out.println(sellerAgents[i].getName());
+          System.out.println("    " + sellerAgents[i].getName());
         }
       }
       catch (FIPAException fe) {
@@ -216,7 +226,7 @@ public class TaskAdministrator extends Agent {
         myAgent.addBehaviour(new FindSubtasksAndAuctionBehavior());
       }
 
-      if (myAgent.getCurQueueSize() == 0) block();
+      //if (myAgent.getCurQueueSize() == 0) block();
     }
   }
 

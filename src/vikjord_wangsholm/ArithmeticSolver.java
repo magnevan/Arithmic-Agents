@@ -58,7 +58,10 @@ public abstract class ArithmeticSolver extends Agent {
     public void onWake() {
       if (!problemQueue.isEmpty()) {
         ArithmeticTask task = problemQueue.poll();
-        System.out.printf("Solving problem %s\n", task.readableDescription());
+        System.out.printf("[%s] Solving problem %s\n",
+            getAID().getLocalName(),
+            task.readableDescription()
+        );
 
         task.answer = doOperation(task.op, task.a, task.b);
 
@@ -127,7 +130,7 @@ public abstract class ArithmeticSolver extends Agent {
         if (task == null) {
           reply.setPerformative(ACLMessage.REFUSE);
           reply.setContent("malformed-task");
-        } else if (task.op != Operator.ADD) {
+        } else if (!canHandleOperator(task.op)) {
           reply.setPerformative(ACLMessage.REFUSE);
           reply.setContent("no-capability");
         } else {
